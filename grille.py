@@ -6,6 +6,7 @@ Created on Thu Oct 25 12:53:16 2018
 """
 import numpy as np
 from random import randint
+from Adventurer import *
 
 class Case():
     def __init__(self, i, j, dungeon):
@@ -155,51 +156,6 @@ class MagicSword(Case):
         if "sword" not in personnage.objectInPossession:
             # Ajout de la sword
             personnage.objectInPossession.append("sword")
-
-
-
-class Adventurer():
-    def __init__(self, name = "Héro"):
-        self.name = name
-        self.objectInPossession = []
-
-    def addObject(self, obj):
-        self.objectInPossession.append(obj)
-    
-    def haveObject(self, obj):
-        return obj in self.objectInPossession
-    
-    def loseObject(self, obj):
-        self.objectInPossession.remove(obj)
-        
-    def moveTo(self, direction):
-        if direction == "right":
-            self.j +=1
-        elif direction == "left":
-            self.j -=1
-        elif direction == "bottom":
-            self.i +=1
-        else:
-            self.i -=1
-            
-    def goTo(self, i, j):
-        self.i = i
-        self.j = j
-    
-    def goIn(self, case):
-        self.case = case
-    
-    def getStringObjects(self):
-        s = ""
-        if not self.objectInPossession:
-            return "empty"
-        if "sword" in self.objectInPossession:
-            s+="sword"
-        if "key" in self.objectInPossession:
-            s+="key"
-        if "treasure" in self.objectInPossession:
-            s+="treasure"
-        return s
         
         
 # Convert a txt file to a readable dungeon
@@ -404,8 +360,6 @@ class Dungeon():
     def stateNeighbour(self, state):
         ind = state.case.getIndicePossibleMove()
         k = self.possibleSac.index(state.objects)
-        if type(state.case.getIndiceCaseAction(action)) == Treasure and "key" in state.objects and "treasure" not in state.objects:
-            k = self.possibleSac.index(state.objects+"treasure")
         return [self.states[i][j][k] for (i,j) in ind]
         
     def stateAfterAction(self, state, action):
@@ -431,7 +385,7 @@ class Dungeon():
     
     def getAllStates(self):
         s = []
-        for ligne in dungeon.states:
+        for ligne in self.states:
             for case in ligne:
                 for state in case:
                     s.append(state)
@@ -467,72 +421,3 @@ class State():
         print("Déplacement vers "+str(self.decision))
         print("Les objets en possessions sont "+str(self.objects))
         print("")
-            
-        
-        
-
-adventurer = Adventurer()
-dungeon = Dungeon()
-grid = openDungeon("Dungeon2.txt", dungeon)
-dungeon.addGrid(grid)
-dungeon.addAdventurer(adventurer)
-dungeon.instanciation()
-
-def gamma(i):
-    return 0.99**i
-
-# Lancement de  l'itération à la valeur
-continuer = 1
-t=0
-while continuer:
-    print(gamma(t))
-    for ligne in dungeon.states:
-        for case in ligne:
-            for state in case:
-                for action in state.case.getPossibleMove():
-                    
-                    q = state.Q[action]
-                    state.Q[action] = state.R[action] + gamma(t)*sum([state.T[action][state2] * state2.value for state2 in state.getAllNeighbourState(action)])
-                    
-                    if state.objects == "swordkey" and state.case.i == 0 and state.case.j == 2:
-                        print(action, q, state.Q[action])
-                        input()
-                state.value, state.valueBefore = max([val for val in state.Q.values()]), state.value
-
-    m = [abs(state.value - state.valueBefore) for state in dungeon.getAllStates()]
-    if np.max(m)<1e-10:
-        continuer = 0
-    t+=1
-
-
-for ligne in dungeon.states:        
-    for case in ligne:
-        for state in case:
-            state.decision = [action for action in state.case.getPossibleMove() if state.Q[action] == np.max([state.Q[action2] for action2 in state.case.getPossibleMove()])][0]
-
-
-
-
-def affichage():
-    for state in dungeon.getAllStates():
-        if state.objects == "key":
-            state.afficher()
-
-#affichage()
-"""
-for ligne in dungeon.states:
-    for case in ligne:
-        for state in case:
-            state.decision = state.case.getPossibleMove()[0]
-
-
-            
-a = np.array([[1 if stateEnd == dungeon.stateAfterAction(stateStart, stateStart.decision) else 0 for stateEnd in dungeon.getAllStates()] for stateStart in dungeon.getAllStates()])
-print(a)
-for i in range(len(a)):
-    a[i,i] = -1
-
-b = [-state.R[state.decision] for state in dungeon.getAllStates()]
-print(b)
-x = np.linalg.solve(a, b)
-"""

@@ -21,7 +21,7 @@ while continuer:
     for ligne in dungeon.states:
         for case in ligne:
             for state in case:
-                for action in state.case.getPossibleMove():
+                for action in state.case.possibleMove:
                     
                     q = state.Q[action]
                     state.Q[action] = state.R[action] + gamma(t)*sum([state.T[action][state2] * state2.value for state2 in state.getAllNeighbourState(action)])
@@ -37,7 +37,7 @@ while continuer:
 for ligne in dungeon.states:        
     for case in ligne:
         for state in case:
-            state.decision = [action for action in state.case.getPossibleMove() if state.Q[action] == np.max([state.Q[action2] for action2 in state.case.getPossibleMove()])][0]
+            state.decision = [action for action in state.case.possibleMove if state.Q[action] == np.max([state.Q[action2] for action2 in state.case.possibleMove])][0]
 
 
 
@@ -85,11 +85,9 @@ for i in range(len(grid)):
         
 
 i, j = adventurer.case.i, adventurer.case.j
-persoObjects = adventurer.getStringObjects()
-adventurer.objectInPossession = ["key"] # On le fait directement commencer avec la clé
 fenetre.blit(perso, (j*tailleX,i*tailleY))
 
-state = dungeon.getState(i, i, persoObjects)
+state = dungeon.getState(i, i, adventurer.objectInPossession)
 
 continuer = 1
 #Boucle infinie

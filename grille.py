@@ -18,27 +18,11 @@ class Case():
         
     def action(self, personnage):
         print("The adventurer is in the room ({}, {})".format(self.i, self.j))
-    
-    def getRecompense(self):
-        return 0
-    
-    def getPossibleMove(self):
-        return self.possibleMove
-    
-    def setPossibleMove(self, move):
-        self.possibleMove = move
+
     
     def getIndicePossibleMove(self):
-        ind = []
-        if "right" in self.possibleMove:
-            ind.append((self.i,self.j+1))
-        if "left" in self.possibleMove:
-            ind.append((self.i,self.j-1))
-        if "top" in self.possibleMove:
-            ind.append((self.i-1,self.j))
-        if "bottom" in self.possibleMove:
-            ind.append((self.i+1,self.j))
-        return ind
+        return [self.getIndiceCaseAction(action) for action in self.possibleMove]
+
         
     def getIndiceCaseAction(self, action):
         if "right" == action:
@@ -122,9 +106,6 @@ class Treasure(Case):
             print("Tresor ramassé")
         else:
             print("Trésor non ramasé")
-            
-    def getRecompense(self):
-        return 10
         
 class MagicPortal(Case):
     def __init__(self, i, j, dungeon):
@@ -196,8 +177,6 @@ def openDungeon(nomFichier, dungeon):
     
 class Dungeon():
     def __init__(self):
-        # Initialisation de la position de l'aventurier
-        # Trouver la position de départ
         print("Dungeon ready to be instance")
     
     def addGrid(self, grid):
@@ -232,15 +211,15 @@ class Dungeon():
                     
                 if j == 0 or type(self.grid[i][j-1])==Wall:
                     possibleMove.remove("left")
-                if j == len(self.grid)-1 or type(self.grid[i][j+1])==Wall:
+                if j == len(self.grid[0])-1 or type(self.grid[i][j+1])==Wall:
                     possibleMove.remove("right")
                     
-                self.grid[i][j].setPossibleMove(possibleMove)
+                self.grid[i][j].possibleMove = possibleMove
     
     def createState(self):
         self.states = []
-        # il y a autant d'état par case que de possibilité d'objet dans le sac de l'avdventurer
-        self.possibleSac = ["empty", "sword", "key", "swordkey", "swordkeytreasure"]
+        # il y a autant d'état par case que de possibilité d'objet dans le sac de l'adventurer
+        self.possibleSac = [[], ['sword'], ["key"], ["sword","key"], ["key","treasure"], ["sword","key","treasure"]]
         
         for i in range(len(self.grid)):
             self.states.append([])
@@ -255,13 +234,12 @@ class Dungeon():
     
     def createTransition(self):
         for state in self.getAllStates():
-            for action in state.case.getPossibleMove():
+            for action in state.case.possibleMove:
                 state2 = self.stateAfterAction(state, action)
                 if  type(state2.case) == Trap:
                     state.T[action][state2] = 0.7
                     i, j = self.startingPosition.i, self.startingPosition.j
-                    k = self.possibleSac.index(state.objects)
-                    state.T[action][self.states[i][j][k]] = 0.3
+                    state.T[action][self.getState(i, j, state2.objects)] = 0.3
                 
                 elif  type(state2.case) == MovingPlatform:
                     neighbours = self.stateNeighbour(state2)
@@ -284,7 +262,7 @@ class Dungeon():
         for ligne in self.states:
                 for case in ligne:
                     for state in case:
-                        for action in state.case.getPossibleMove():
+                        for action in state.case.possibleMove:
                             futurState = self.stateAfterAction(state, action)
                             if type(futurState.case) == Enemy:
                                 if "sword" in futurState.objects:
@@ -355,33 +333,36 @@ class Dungeon():
         for sta in self.getAllStates():
             if sta.objects == state.objects and type(sta.case) != Wall:
                 s.append(sta)
+            """
+            elif type(sta.case) == Treasure and "key" in state.objects and "treasure" not in state.object and :
+                s.append(sta)
+            elif type(sta.case) == GoldenKey and "key" not in state.objects:
+                s.append(sta)
+                """
         return s
                 
     def stateNeighbour(self, state):
-        ind = state.case.getIndicePossibleMove()
-        k = self.possibleSac.index(state.objects)
-        return [self.states[i][j][k] for (i,j) in ind]
+        return [self.stateAfterAction(state, action) for action in state.case.possibleMove]
         
     def stateAfterAction(self, state, action):
         i, j = state.case.getIndiceCaseAction(action)
-        k = self.possibleSac.index(state.objects)
+        objet = state.objects
         if type(state.case.getIndiceCaseAction(action)) == Treasure and "key" in state.objects and "treasure" not in state.objects:
-            k = self.possibleSac.index(state.objects+"treasure")
-        return self.states[i][j][k]
+            objet = state.objects+["treasure"]
+        return self.getState(i,j, objet)
     
     def getState(self, i, j, obj):
-        k = self.possibleSac.index(obj)
-        return self.states[i][j][k]
+        for k in range(len(self.possibleSac)):
+            if sorted(self.possibleSac[k]) == sorted(obj):
+                return self.states[i][j][k]
     
     def caseAfterAction(self, case, action):
         i, j = case.getIndiceCaseAction(action)
         return self.grid[i][j]
     
     def getStateAdventurer(self, case, adventurer):
-        obj = adventurer.getStringObjects()
-        print(obj)
         i, j = case.i, case.j
-        return self.getState(i, j, obj)
+        return self.getState(i, j, adventurer.objectInPossession)
     
     def getAllStates(self):
         s = []
@@ -399,12 +380,12 @@ class State():
         self.valueBefore = 0
         
         self.Q = {}
-        for action in self.case.getPossibleMove():
+        for action in self.case.possibleMove:
             self.Q[action] = 0
         
         self.R = {}
         self.T={}
-        for action in self.case.getPossibleMove():
+        for action in self.case.possibleMove:
             self.T[action] = {}
         
         self.decision = ""

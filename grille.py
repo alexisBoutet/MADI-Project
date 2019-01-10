@@ -138,7 +138,8 @@ class MagicSword(Case):
             # Ajout de la sword
             personnage.objectInPossession.append("sword")
         
-        
+
+# Effectivement, ça ne devrait pas être là
 # Convert a txt file to a readable dungeon
 def openDungeon(nomFichier, dungeon):
     grid = []
@@ -156,6 +157,42 @@ def openDungeon(nomFichier, dungeon):
                     case = Wall(i,j, dungeon)
                 elif val == "e":
                     case = Enemy(i,j, dungeon)
+                elif val == "r":
+                    case = Trap(i,j, dungeon)
+                elif val == "c":
+                    case = Cracks(i,j, dungeon)
+                elif val == "t":
+                    case = Treasure(i,j, dungeon)
+                elif val == "s":
+                    case = MagicSword(i,j, dungeon)
+                elif val == "k":
+                    case = GoldenKey(i,j, dungeon)                
+                elif val == "p":
+                    case = MagicPortal(i,j, dungeon)
+                elif val == "-":
+                    case = MovingPlatform(i,j, dungeon)  
+                
+                grid[i].append(case)
+    return grid
+
+# new open pour ne pas tout prendre en compte
+# Convert a txt file to a readable dungeon
+def openDungeon(nomFichier, dungeon):
+    grid = []
+    with open(nomFichier, "r") as fichier:
+        donnees = fichier.readlines()
+        for i in range(len(donnees)):
+            grid.append([])
+            for j in range(len(donnees[0])-1):
+                val = donnees[i][j]
+                if val == "b":
+                    case = Blank(i,j, dungeon)
+                elif val == "0":
+                    case = StartingPosition(i,j, dungeon)
+                elif val == "w":
+                    case = Wall(i,j, dungeon)
+                elif val == "e":
+                    case = Blank(i,j, dungeon)
                 elif val == "r":
                     case = Trap(i,j, dungeon)
                 elif val == "c":
@@ -274,7 +311,7 @@ class Dungeon():
                             elif type(futurState.case) == Treasure:
                                 if "key" in futurState.objects and not("treasure" in futurState.objects):
                                     print("key not treasure",futurState.objects)
-                                    state.R[action] = 20
+                                    state.R[action] = 5
                                 
                                 else:
                                     state.R[action] = 0
@@ -284,14 +321,14 @@ class Dungeon():
                                     print("sword",futurState.objects)
                                     state.R[action] = 0
                                 else:
-                                    state.R[action] = 10
+                                    state.R[action] = 5
                             
                             elif type(futurState.case) == GoldenKey:
                                 if "key" in futurState.objects:
                                     print("key",futurState.objects)
                                     state.R[action] = 0
                                 else:
-                                    state.R[action] = 10
+                                    state.R[action] = 5
                             
                             elif type(futurState.case) == Cracks:
                                 state.R[action] = -10
@@ -308,7 +345,7 @@ class Dungeon():
                             elif type(futurState.case) == StartingPosition:
                                 if "treasure" in futurState.objects:
                                     print("treasure",futurState.objects)
-                                    state.R[action] = 20
+                                    state.R[action] = 5
                                 else:
                                     state.R[action] = 0
                                 
@@ -377,7 +414,7 @@ class State():
         self.objects = objects
         
         self.value = 0
-        self.valueBefore = 0
+        self.valueBefore = []
         
         self.Q = {}
         for action in self.case.possibleMove:
@@ -389,9 +426,10 @@ class State():
             self.T[action] = {}
         
         self.decision = ""
+        self.decisionBefore = []
         
     def getAllNeighbourState(self, action):
-        return self.T[action].keys()
+        return [k for k in self.T[action].keys()]
     
     def afficher(self):
         print("Nous sommes sur la case "+str(self.case.i)+" "+str(self.case.j)+" de type "+str(type(self.case)))

@@ -10,6 +10,7 @@ from function import *
 from scipy.optimize import linprog
 import random
 from Adventurer import *
+import numpy as np
 
 def policyIteration(dungeon):
     continuer = 1
@@ -125,17 +126,17 @@ def valueIteration(dungeon):
 
 def qlearning(dungeon):
     randomly = 0.2
-    nb_episode = 5
-    max_step = 5000
-    actions = ["right", "left", "top", "bottom"]
-    qtable = [[0 for i in actions] for state in dungeon.states]
-    
+    nb_episode = 100
+    max_step = 50000
+    actions = np.array(["right", "left", "top", "bottom"])
+    qtable = np.array([[0 for i in actions] for state in dungeon.states], dtype=float)
+
     numberIterationToWin = []
-    
+
     tot = 0
     i = 0
+    np.set_printoptions(threshold=np.nan)
     while i < nb_episode:
-        
         tot +=1
         dungeon.adventurer = Adventurer()
         state = dungeon.getState(dungeon.startingPosition, [])
@@ -144,54 +145,90 @@ def qlearning(dungeon):
         adventurer.goIn(state.case)
         finish = False
         sumRewards = 0
-        
+        #print(i)
         for j in range(max_step):
+            action = None
             # Choix d'une action
-            if random.uniform(0, 1) < randomly**i:
-                action = random.choice(list(state.case.voisin.keys()))
+            restrict_list = [x in state.case.voisin.keys() for x in actions]
+            valid_actions = actions[restrict_list]
+            if random.uniform(0, 1) < randomly * 0.99**i:
+                k = random.randint(0, len(valid_actions) - 1)
+                action = valid_actions[k]
             else:
                 k = 0
                 val = -float("inf")
-                for l in range(len(actions)):
+                '''for l in range(len(actions)):
                     if qtable[dungeon.states.index(state)][l] > val and actions[l] in state.case.voisin.keys():
                         k = l
-                        val = qtable[dungeon.states.index(state)][l]
-                action = actions[k]
-                
+                        val = qtable[dungeon.states.index(state)][l]'''
+                k = np.argmax(qtable[dungeon.states.index(state)][restrict_list])
+                '''print(qtable[dungeon.states.index(state)])
+                print(valid_actions)
+                print([x in state.case.voisin.keys() for x in actions])
+                print(k)'''
+                action = valid_actions[k]
+
+            action_index = actions.tolist().index(action)
             # Faire cette action
             adventurer.goIn(state.case.voisin[action])
             alive = adventurer.case.action(adventurer)
-            
+
             newState = dungeon.getState(adventurer.case, adventurer.objects)
             if not alive:
-                reward = -100
+                reward = -50
                 finish= True
             elif "treasure" in newState.objects and type(newState.case) == StartingPosition:
-                reward = 99
+                reward = 49
                 numberIterationToWin.append(j)
                 finish = True
-                i+=1
-                print("finish", i)
+                print("finish", i, tot)
+                i += 1
+                #print(qtable)
+            elif "treasure" in newState.objects:
+                reward = 10
+                #print("treasure !")
+            elif "key" in newState.objects:
+                reward = 1
+                #print("key !")
+                #print(newState.objects)
             else:
                 reward = 0
-                
+
             sumRewards += reward
-            qtable[dungeon.states.index(state)][actions.index(action)] = alpha(i) * (reward + gamma() * np.max(qtable[dungeon.states.index(newState)]) - qtable[dungeon.states.index(state)][actions.index(action)])
-            
+            #print(dungeon.states.index(state))
+            #print(state)
+            '''if "key" in newState.objects:
+                print(qtable[dungeon.states.index(state)][action_index])
+                print(0.9 * float(reward + gamma() * np.max(qtable[dungeon.states.index(newState)]) - qtable[dungeon.states.index(state)][action_index]))'''
+            qtable[dungeon.states.index(state), action_index] += 0.1 * float(reward + gamma() * np.max(qtable[dungeon.states.index(newState)]) - qtable[dungeon.states.index(state)][action_index])
+            #print(reward)
+            '''if "key" in newState.objects:
+                print(qtable[dungeon.states.index(state)][action_index])
+                print(qtable[dungeon.states.index(newState)])'''
             state = newState
             if finish:
                 break
-            
+
     # Créer les décision
+    print(qtable)
     for state in dungeon.states:
         i = dungeon.states.index(state)
         val = -float("inf")
-        for action in state.T.keys():
+        restrict_list = [x in state.case.voisin.keys() for x in actions]
+        valid_actions = actions[restrict_list]
+
+        k = np.argmax(qtable[dungeon.states.index(state)][restrict_list])
+        action = valid_actions[k]
+        state.decision = action
+        '''for action in state.T.keys():
             if qtable[i][actions.index(action)] > val:
                 state.decision = action
-                val = qtable[i][actions.index(action)]
-        
-        
-        
-        
+                val = qtable[i][actions.index(action)]'''
+
+    print(dungeon.states.index(dungeon.getState(dungeon.getStartingPosition(), [])))
+    print(qtable[dungeon.states.index(dungeon.getState(dungeon.getStartingPosition(), []))])
+
+
+
+
         

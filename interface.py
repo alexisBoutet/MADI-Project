@@ -71,7 +71,7 @@ def affiche(dungeon):
         pygame.display.flip()
 
 dungeon = Dungeon()
-dungeon.open("Dungeon1.txt")
+dungeon.open("Dungeon2.txt")
 dungeon.instanciation(Adventurer(), True)
 #valueIteration(dungeon)
 qlearning(dungeon)

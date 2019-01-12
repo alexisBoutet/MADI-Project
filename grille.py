@@ -19,6 +19,9 @@ class Case():
     
     def action(self, personnage):
         return True
+
+    def __repr__(self):
+        return "(" + str(self.i) + ", " + str(self.j) + ")"
         
 class StartingPosition(Case):
     def __init__(self, dungeon, i, j):
@@ -316,4 +319,7 @@ class State():
         for state, proba in self.T[action].items():
             v+= proba
             if r < v:
-                return state 
+                return state
+
+    def __repr__(self):
+        return "Case : " + str(self.case) + ", objects : " + str(self.objects)

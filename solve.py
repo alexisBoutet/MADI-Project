@@ -66,22 +66,25 @@ def PL(dungeon):
                 l= []
                 for state2 in states:
                     if state2 in voisin:
-                        l.append(state.T[action][state2])
+                        l.append(0.9 * state.T[action][state2])
+                    elif state == state2:
+                        l.append(-1.0)
                     else:
                         l.append(0.0)
                         
                 line = l
-                line[dic[state]]-=1
                 a_ub.append(line)
     
-    bounds = [(-100, 100) for i in states]
-    
-    res = linprog(c, a_ub, b_ub, bounds = bounds)
+    bounds = [(None, None) for i in states]
+
+    res = linprog(c, a_ub, b_ub, bounds = bounds, options={"maxiter": 10000000}).x
     print(res)
     
     for state in states:
         i = 0
         for action in state.case.voisin.keys():
+            print(state.R[action])
+            print([dic[state2] for state2 in state.getAllNeighbourState(action)])
             v = state.R[action] + sum([state.T[action][state2] * res[dic[state2]] for state2 in state.getAllNeighbourState(action)])
             if v > state.value or i== 0:
                 state.value = v
@@ -89,45 +92,46 @@ def PL(dungeon):
             i+=1
     return dungeon
 
+
 def valueIteration(dungeon):
-    
     # Lancement de  l'itération à la valeur
     continuer = 1
-    t=0
+    t = 0
     while continuer:
         for state in dungeon.states:
             for action in state.T.keys():
-                        
+
                 q = state.Q[action]
-                state.Q[action] = state.R[action] + gamma()*sum([state.T[action][state2] * state2.value for state2 in state.getAllNeighbourState(action)])
-                if state.case.i == 0 and state.case.j == 2 and "key" in state.objects and "sword" in state.objects and "treasure" not in state.objects and action=="left":
-                    print("Action en cours : "+action)
-                    print("Valeur de cette action : "+str(state.R[action]))
+                state.Q[action] = state.R[action] + gamma() * sum(
+                    [state.T[action][state2] * state2.value for state2 in state.getAllNeighbourState(action)])
+                if state.case.i == 0 and state.case.j == 2 and "key" in state.objects and "sword" in state.objects and "treasure" not in state.objects and action == "left":
+                    print("Action en cours : " + action)
+                    print("Valeur de cette action : " + str(state.R[action]))
                     print([state.T[action][state2] * state2.value for state2 in state.getAllNeighbourState(action)])
                     print(state.value)
                     q = state.Q[action]
                     print(q)
-                            
+
             state.valueBefore.append(state.value)
             state.value = max([val for val in state.Q.values()])
-    
+
         m = [abs(state.value - state.valueBefore[-1]) for state in dungeon.states]
-        
-        #showQ(dungeon, 0)
-        if np.max(m)<1e-5:
+
+        # showQ(dungeon, 0)
+        if np.max(m) < 1e-5:
             continuer = 0
-        t+=1
-    
-    
-    for state in dungeon.states:        
-        state.decision = [action for action in state.T.keys() if state.Q[action] == np.max([state.Q[action2] for action2 in state.T.keys()])][0]
+        t += 1
+
+    for state in dungeon.states:
+        state.decision = [action for action in state.T.keys() if
+                          state.Q[action] == np.max([state.Q[action2] for action2 in state.T.keys()])][0]
 
     return dungeon
 
 def qlearning(dungeon):
     randomly = 0.2
     nb_episode = 100
-    max_step = 50000
+    max_step = 5000
     actions = np.array(["right", "left", "top", "bottom"])
     qtable = np.array([[0 for i in actions] for state in dungeon.states], dtype=float)
 
@@ -145,6 +149,7 @@ def qlearning(dungeon):
         adventurer.goIn(state.case)
         finish = False
         sumRewards = 0
+        run = [state]
         #print(i)
         for j in range(max_step):
             action = None
@@ -174,6 +179,7 @@ def qlearning(dungeon):
             alive = adventurer.case.action(adventurer)
 
             newState = dungeon.getState(adventurer.case, adventurer.objects)
+            run.append(newState)
             if not alive:
                 reward = -50
                 finish= True
@@ -183,6 +189,9 @@ def qlearning(dungeon):
                 finish = True
                 print("finish", i, tot)
                 i += 1
+                print(len(run))
+                if len(run) < 10:
+                    print(run)
                 #print(qtable)
             elif "treasure" in newState.objects:
                 reward = 10
@@ -210,7 +219,7 @@ def qlearning(dungeon):
                 break
 
     # Créer les décision
-    print(qtable)
+    # print(qtable)
     for state in dungeon.states:
         i = dungeon.states.index(state)
         val = -float("inf")
@@ -227,6 +236,11 @@ def qlearning(dungeon):
 
     print(dungeon.states.index(dungeon.getState(dungeon.getStartingPosition(), [])))
     print(qtable[dungeon.states.index(dungeon.getState(dungeon.getStartingPosition(), []))])
+    dungeon.adventurer = Adventurer()
+    state = dungeon.getState(dungeon.startingPosition, [])
+    adventurer = dungeon.adventurer
+    adventurer.objects = []
+    adventurer.goIn(state.case)
 
 
 

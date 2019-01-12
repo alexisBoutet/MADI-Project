@@ -72,7 +72,8 @@ def affiche(dungeon):
 
 dungeon = Dungeon()
 dungeon.open("Dungeon2.txt")
-dungeon.instanciation(Adventurer(), True)
+dungeon.instanciation(Adventurer(), False)
+#qlearning(dungeon)
 #valueIteration(dungeon)
-qlearning(dungeon)
+PL(dungeon)
 affiche(dungeon)

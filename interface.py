@@ -10,7 +10,37 @@ from solve import *
 """
 Affichage
 """
-
+def afficheDecision(dungeon, objects):
+    actions = ["right", "left", "top", "bottom"]
+    pygame.init()
+    tailleX = 60
+    tailleY = 36
+    fenetre = pygame.display.set_mode((len(dungeon.cases) * tailleX, len(dungeon.cases[0]) * tailleY))
+    imagedecisions = {action:pygame.image.load(action+".png").convert_alpha() for action in actions}
+    print(imagedecisions)
+    image = [[0 for i in ligne] for ligne in dungeon.cases]
+    for i in range(len(dungeon.cases)):
+        for j in range(len(dungeon.cases[0])): 
+            case = dungeon.cases[i][j]
+            image[i][j] = pygame.image.load(case.image).convert()
+            fenetre.blit(image[i][j], (j*tailleX,i*tailleY))
+            
+            # Si on a un choix à faire dans la case
+            if type(case) not in [Wall, Cracks, MovingPlatform, MagicPortal]:
+                state = dungeon.getState(case, objects)
+                if state.decision:
+                    fenetre.blit(imagedecisions[state.decision], (j*tailleX,i*tailleY))
+     
+    continuer = 1
+    #Boucle infinie
+    while continuer:
+        pygame.time.Clock().tick(30)
+        for event in pygame.event.get():   #On parcours la liste de tous les événements reçus
+            if event.type == QUIT:     #Si un de ces événements est de type QUIT
+                continuer = 0      #On arrête la boucle
+    
+        pygame.display.flip()
+            
 def affiche(dungeon):
     pygame.init()
     tailleX = 60
@@ -75,5 +105,5 @@ dungeon.open("Dungeon2.txt")
 dungeon.instanciation(Adventurer(), False)
 #qlearning(dungeon)
 #valueIteration(dungeon)
-PL(dungeon)
-affiche(dungeon)
+valueIteration(dungeon)
+afficheDecision(dungeon, [])

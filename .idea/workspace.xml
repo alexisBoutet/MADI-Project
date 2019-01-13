@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="198568d8-76b6-456e-992f-67b6db7e9296" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dungeon3.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Dungeon3.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grille.py" beforeDir="false" afterPath="$PROJECT_DIR$/grille.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/madi/Dungeon3.txt" beforeDir="false" afterPath="$PROJECT_DIR$/madi/Dungeon3.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/madi/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/madi/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/solve.py" beforeDir="false" afterPath="$PROJECT_DIR$/solve.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/solve.rar" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -37,12 +30,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="1040" />
+          <entry key="py" value="1223" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="1040" />
+          <entry key="Python" value="1223" />
         </counts>
       </usages-collector>
     </session>
@@ -52,8 +45,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/solve.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="714">
-              <caret line="86" column="110" selection-start-line="86" selection-start-column="110" selection-end-line="86" selection-end-column="110" />
+            <state relative-caret-position="-1938">
+              <caret line="86" selection-start-line="86" selection-end-line="86" />
             </state>
           </provider>
         </entry>
@@ -70,7 +63,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grille.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="177">
+            <state relative-caret-position="1758">
               <caret line="289" column="37" selection-start-line="289" selection-start-column="37" selection-end-line="289" selection-end-column="37" />
             </state>
           </provider>
@@ -96,7 +89,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="355" />
     <option name="y" value="70" />
     <option name="width" value="1400" />
@@ -187,6 +180,13 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/grille.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1758">
+          <caret line="289" column="37" selection-start-line="289" selection-start-column="37" selection-end-line="289" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/interface.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1173">
@@ -194,17 +194,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grille.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="177">
-          <caret line="289" column="37" selection-start-line="289" selection-start-column="37" selection-end-line="289" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/solve.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="714">
-          <caret line="86" column="110" selection-start-line="86" selection-start-column="110" selection-end-line="86" selection-end-column="110" />
+        <state relative-caret-position="-1938">
+          <caret line="86" selection-start-line="86" selection-end-line="86" />
         </state>
       </provider>
     </entry>

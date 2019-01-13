@@ -10,7 +10,7 @@ from solve import *
 """
 Affichage
 """
-def afficheDecision(dungeon, objects):
+def afficheDecision(dungeon, objects, do_blit=False):
     actions = ["right", "left", "top", "bottom"]
     pygame.init()
     tailleX = 60
@@ -33,13 +33,14 @@ def afficheDecision(dungeon, objects):
      
     continuer = 1
     #Boucle infinie
-    while continuer:
-        pygame.time.Clock().tick(30)
-        for event in pygame.event.get():   #On parcours la liste de tous les événements reçus
-            if event.type == QUIT:     #Si un de ces événements est de type QUIT
-                continuer = 0      #On arrête la boucle
-    
-        pygame.display.flip()
+    if do_blit:
+        while continuer:
+            pygame.time.Clock().tick(30)
+            for event in pygame.event.get():   #On parcours la liste de tous les événements reçus
+                if event.type == QUIT:     #Si un de ces événements est de type QUIT
+                    continuer = 0      #On arrête la boucle
+        
+            pygame.display.flip()
  
 def jouer(dungeon):
     pygame.init()
@@ -138,35 +139,38 @@ def affiche(dungeon):
     
     continuer = 1
     #Boucle infinie
+    display_decisions = False
     while continuer:
         pygame.time.Clock().tick(30)
+        case = adventurer.case
+        state = dungeon.getState(case, adventurer.objects)
+
+        for i in range(len(dungeon.cases)):
+            for j in range(len(dungeon.cases[0])):
+                fenetre.blit(image[i][j], (j*tailleX,i*tailleY))
+
+        if display_decisions:
+            afficheDecision(dungeon, dungeon.adventurer.objects)
+            
+        fenetre.blit(perso, (state.case.j*tailleX,state.case.i*tailleY))
         for event in pygame.event.get():   #On parcours la liste de tous les événements reçus
             if event.type == QUIT:     #Si un de ces événements est de type QUIT
                 continuer = 0      #On arrête la boucle
-                
-            
-                
+
             if event.type == KEYDOWN:
-                if event.key == K_SPACE:
-                    
-                    
+                if event.key == K_SPACE: 
                     adventurer.goIn(case.voisin[state.decision])
                     adventurer.case.action(adventurer)
-                    case = adventurer.case
-                    # Evenement de la pièce
-                    state = dungeon.getState(case, adventurer.objects)
-                    for i in range(len(dungeon.cases)):
-                        for j in range(len(dungeon.cases[0])):
-                            fenetre.blit(image[i][j], (j*tailleX,i*tailleY))
-            
-            
-            
-                    """ Quel état on est """
-                    #state.afficher()
 
-            
+			
+                if event.key == K_o:
+                    display_decisions = not display_decisions
+
+
+ 
+
+                    #state.afficher()
                     #print(state.objects)
-                    fenetre.blit(perso, (state.case.j*tailleX,state.case.i*tailleY))
         #Rafraîchissement de l'écran
         pygame.display.flip()
 
@@ -176,4 +180,4 @@ dungeon.instanciation(Adventurer(), False)
 #qlearning(dungeon)
 #valueIteration(dungeon)
 valueIteration(dungeon)
-jouer(dungeon)
+affiche(dungeon)

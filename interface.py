@@ -15,7 +15,7 @@ def afficheDecision(dungeon, objects, do_blit=False):
     pygame.init()
     tailleX = 60
     tailleY = 36
-    fenetre = pygame.display.set_mode((len(dungeon.cases) * tailleX, len(dungeon.cases[0]) * tailleY))
+    fenetre = pygame.display.set_mode((len(dungeon.cases[0]) * tailleX, len(dungeon.cases) * tailleY))
     imagedecisions = {action:pygame.image.load(action+".png").convert_alpha() for action in actions}
     print(imagedecisions)
     image = [[0 for i in ligne] for ligne in dungeon.cases]
@@ -120,7 +120,7 @@ def affiche(dungeon):
     pygame.init()
     tailleX = 60
     tailleY = 36
-    fenetre = pygame.display.set_mode((len(dungeon.cases) * tailleX, len(dungeon.cases[0]) * tailleY))
+    fenetre = pygame.display.set_mode((len(dungeon.cases[0]) * tailleX, len(dungeon.cases) * tailleY))
     perso = pygame.image.load("perso.png").convert_alpha()
     image = [[0 for i in ligne] for ligne in dungeon.cases]
     for i in range(len(dungeon.cases)):
@@ -151,7 +151,7 @@ def affiche(dungeon):
 
         if display_decisions:
             afficheDecision(dungeon, dungeon.adventurer.objects)
-            
+
         fenetre.blit(perso, (state.case.j*tailleX,state.case.i*tailleY))
         for event in pygame.event.get():   #On parcours la liste de tous les événements reçus
             if event.type == QUIT:     #Si un de ces événements est de type QUIT
@@ -175,7 +175,7 @@ def affiche(dungeon):
         pygame.display.flip()
 
 dungeon = Dungeon()
-dungeon.open("Dungeon2.txt")
+dungeon.open("Dungeon5.txt")
 dungeon.instanciation(Adventurer(), False)
 #qlearning(dungeon)
 #valueIteration(dungeon)

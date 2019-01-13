@@ -130,7 +130,7 @@ def valueIteration(dungeon):
 
 def qlearning(dungeon):
     randomly = 0.2
-    nb_episode = 100
+    nb_episode = 200
     max_step = 5000
     actions = np.array(["right", "left", "top", "bottom"])
     qtable = np.array([[0 for i in actions] for state in dungeon.states], dtype=float)
@@ -181,10 +181,10 @@ def qlearning(dungeon):
             newState = dungeon.getState(adventurer.case, adventurer.objects)
             run.append(newState)
             if not alive:
-                reward = -50
+                reward = -30
                 finish= True
             elif "treasure" in newState.objects and type(newState.case) == StartingPosition:
-                reward = 49
+                reward = 20
                 numberIterationToWin.append(j)
                 finish = True
                 print("finish", i, tot)

@@ -88,4 +88,23 @@ def change_alpha(img,alpha=255):
          r,g,b,old_alpha=img.get_at((x,y)) 
          if old_alpha>0: 
              img.set_at((x,y),(r,g,b,alpha))
+             
+def saveDecision(dungeon, nom):
+    actions = ['top', 'bottom', 'left', 'right']
+    f = open(nom, "w")
+    s = ""
+    for state in dungeon.states:
+        s+= str(actions.index(state.decision))
+    f.write(s)
+    f.close()
+
+def getDecision(dungeon, nom):
+    actions = ['top', 'bottom', 'left', 'right']
+    f = open(nom, "r")
+    s = f.readline()
+    i = 0
+    for state in dungeon.states:
+        state.decision = actions[i]
+        i+=1
+    f.close()
         

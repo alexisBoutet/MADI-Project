@@ -7,6 +7,9 @@ Created on Wed Dec  5 13:11:32 2018
 """
 
 import random
+from grille import *
+import numpy as np
+
 def gamma():
     return 0.9
 
@@ -107,4 +110,32 @@ def getDecision(dungeon, nom):
         state.decision = actions[i]
         i+=1
     f.close()
+
+def jouerXFois(dungeon, x):
+    mort = 0
+    iterations = []
+    adventurer = dungeon.adventurer
+    for i in range(x):
+        adventurer.objects = []
+        adventurer.goIn(dungeon.startingPosition)
+        
+        state = dungeon.getState(adventurer.case, adventurer.objects)
+        
+        for j in range(1000):
+            adventurer.goIn(state.case.voisin[state.decision])
+            alive = adventurer.case.action(adventurer)
+            if not alive:
+                mort+=1
+                break
+            
+            state = dungeon.getState(adventurer.case, adventurer.objects)
+            if "treasure" in state.objects and type(state.case) == StartingPosition:
+                iterations.append(j)
+                break
+    return mort, np.mean(iterations)
+        
+        
+        
+        
+        
         

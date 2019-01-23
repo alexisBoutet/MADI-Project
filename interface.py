@@ -10,6 +10,7 @@ from solve import *
 """
 Affichage
 """
+# Affiche les décisions en fonctions d'une liste d'objet
 def afficheDecision(dungeon, objects, do_blit=False):
     actions = ["right", "left", "top", "bottom"]
     pygame.init()
@@ -28,7 +29,8 @@ def afficheDecision(dungeon, objects, do_blit=False):
             # Si on a un choix à faire dans la case
             if type(case) not in [Wall, Cracks, MovingPlatform, MagicPortal]:
                 state = dungeon.getState(case, objects)
-                if state.decision:
+                # Si il y a une décision et quel a été calculé
+                if state.decision and state.value != 0.0:
                     fenetre.blit(imagedecisions[state.decision], (j*tailleX,i*tailleY))
      
     continuer = 1
@@ -39,9 +41,36 @@ def afficheDecision(dungeon, objects, do_blit=False):
             for event in pygame.event.get():   #On parcours la liste de tous les événements reçus
                 if event.type == QUIT:     #Si un de ces événements est de type QUIT
                     continuer = 0      #On arrête la boucle
-        
+                
+                if event.type == KEYDOWN:
+                    
+                    if event.key == K_KP0:
+                        continuer = 0
+                        afficheDecision(dungeon, dungeon.possibleSac[0], True)
+                        
+                    if event.key == K_KP1:
+                        continuer = 0
+                        afficheDecision(dungeon, dungeon.possibleSac[1], True)
+                        
+                    if event.key == K_KP2:
+                        continuer = 0
+                        afficheDecision(dungeon, dungeon.possibleSac[2], True)
+                        
+                    if event.key == K_KP3:
+                        continuer = 0
+                        afficheDecision(dungeon, dungeon.possibleSac[3], True)
+                        
+                    if event.key == K_KP4:
+                        continuer = 0
+                        afficheDecision(dungeon, dungeon.possibleSac[4], True)
+                        
+                    if event.key == K_KP5:
+                        continuer = 0
+                        afficheDecision(dungeon, dungeon.possibleSac[5], True)
+                        
             pygame.display.flip()
  
+# Permet de jouer au jeu seul et de demander de l'aide avec espace si un des algorithmes a été lancé
 def jouer(dungeon):
     pygame.init()
     tailleX = 60
@@ -138,7 +167,7 @@ def affiche(dungeon):
     state = dungeon.getState(dungeon.startingPosition, adventurer.objects)
     
     continuer = 1
-    #Boucle infinie
+    #Boucle infinie 
     display_decisions = False
     while continuer:
         pygame.time.Clock().tick(30)
@@ -174,10 +203,14 @@ def affiche(dungeon):
         #Rafraîchissement de l'écran
         pygame.display.flip()
 
+
+nom = "generate55.txt"
+#generateDungeon(5, 5, nom)
 dungeon = Dungeon()
-dungeon.open("Dungeon5.txt")
+dungeon.open(nom)
 dungeon.instanciation(Adventurer(), False)
-#qlearning(dungeon)
+qlearning(dungeon)
+#PL(dungeon)
 #valueIteration(dungeon)
-valueIteration(dungeon)
+saveDecision(dungeon, "Resultat"+nom)
 affiche(dungeon)
